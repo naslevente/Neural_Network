@@ -123,13 +123,31 @@ class neuralNetwork():
         layer3BiasAverage += layer3BiasNudge
         '''
 
-        self.layer1.synaptic_weights -= (layer1WeightNudges)
-        self.layer2.synaptic_weights -= (layer2WeightNudges)
-        self.layer3.synaptic_weights -= (layer3WeightNudges)
+        layer1WeightAverage += layer1WeightNudges
+        layer2WeightAverage += layer2WeightNudges
+        layer3WeightAverage += layer3WeightNudges
 
-        self.layer1.biases -= (layer1BiasNudge)
-        self.layer2.biases -= (layer2BiasNudge)
-        self.layer3.biases -= (layer3BiasNudge)
+        layer1BiasAverage += layer1BiasNudge
+        layer2BiasAverage += layer2BiasNudge
+        layer3BiasAverage += layer3BiasNudge
+
+        if dataPoint % 100 == 0:
+
+            self.layer1.synaptic_weights -= (layer1WeightAverage / 100)
+            self.layer2.synaptic_weights -= (layer2WeightAverage / 100)
+            self.layer3.synaptic_weights -= (layer3WeightAverage / 100)
+
+            self.layer1.biases -= (layer1BiasAverage / 100)
+            self.layer2.biases -= (layer2BiasAverage / 100)
+            self.layer3.biases -= (layer3BiasAverage / 100)
+
+            layer1WeightAverage = 0
+            layer2WeightAverage = 0
+            layer3WeightAverage = 0
+
+            layer1BiasAverage = 0
+            layer2BiasAverage = 0
+            layer3BiasAverage = 0
 
     #And now for the meat of the network
     def weightDer(self, outputFromLayer3, outputFromLayer2, outputFromLayer1, desiredOutput, trainingSetInputs):
