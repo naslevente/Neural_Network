@@ -76,7 +76,7 @@ class neuralNetwork():
     #plt.show()
 
     #This is the train method. I set a learning rate for both the bias and weights
-    def train(self, input_pixels, desired_output):
+    def train(self, input_pixels, desired_output, dataPoint):
 
         print(self.layer1.synaptic_weights)
         print(self.layer2.synaptic_weights)
@@ -137,7 +137,7 @@ class neuralNetwork():
 
         global layer1BiasAverage
         global layer2BiasAverage
-        global layer3BiasAverage 
+        global layer3BiasAverage
 
         layer1WeightAverage += layer1WeightNudges
         layer2WeightAverage += layer2WeightNudges
@@ -303,7 +303,7 @@ if __name__ == "__main__":
 
     for i in range(50000):
 
-        neuralNet.train(x_train[i], y_train[i])
+        neuralNet.train(x_train[i], y_train[i], i)
         print("Done training with the ", i + 1, "th data. On to the ", i + 2,"th data")
 
     neuralNet.test(x_test[23])
