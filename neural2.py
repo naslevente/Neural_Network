@@ -5,13 +5,13 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from mpl_toolkits.mplot3d import Axes3D
 
-global layer1WeightAverage = 0
-global layer2WeightAverage = 0
-global layer3WeightAverage = 0
+layer1WeightAverage = 0
+layer2WeightAverage = 0
+layer3WeightAverage = 0
 
-global layer1BiasAverage = 0
-global layer2BiasAverage = 0
-global layer3BiasAverage = 0
+layer1BiasAverage = 0
+layer2BiasAverage = 0;
+layer3BiasAverage = 0
 
 class neuronLayer():
 
