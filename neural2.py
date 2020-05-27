@@ -131,6 +131,14 @@ class neuralNetwork():
         layer3BiasAverage += layer3BiasNudge
         '''
 
+        global layer1WeightAverage
+        global layer2WeightAverage
+        global layer3WeightAverage
+
+        global layer1BiasAverage
+        global layer2BiasAverage
+        global layer3BiasAverage 
+
         layer1WeightAverage += layer1WeightNudges
         layer2WeightAverage += layer2WeightNudges
         layer3WeightAverage += layer3WeightNudges
