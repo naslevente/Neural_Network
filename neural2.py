@@ -82,8 +82,8 @@ class neuralNetwork():
         print(self.layer2.synaptic_weights)
         print(self.layer3.synaptic_weights)
 
-        #learningRateWeight = 0.6
-        #learningRateBias = 0.4
+        learningRateWeight = 0.3
+        learningRateBias = 0.3
 
         input = []
 
@@ -139,13 +139,13 @@ class neuralNetwork():
         global layer2BiasAverage
         global layer3BiasAverage
 
-        layer1WeightAverage += layer1WeightNudges
-        layer2WeightAverage += layer2WeightNudges
-        layer3WeightAverage += layer3WeightNudges
+        layer1WeightAverage += (layer1WeightNudges * learningRateWeight)
+        layer2WeightAverage += (layer2WeightNudges * learningRateWeight)
+        layer3WeightAverage += (layer3WeightNudges * learningRateWeight)
 
-        layer1BiasAverage += layer1BiasNudge
-        layer2BiasAverage += layer2BiasNudge
-        layer3BiasAverage += layer3BiasNudge
+        layer1BiasAverage += (layer1BiasNudge * learningRateBias)
+        layer2BiasAverage += (layer2BiasNudge * learningRateBias)
+        layer3BiasAverage += (layer3BiasNudge * learningRateBias)
 
         if dataPoint % 100 == 0:
 
