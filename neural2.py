@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 #from tensorflow.examples.tutorials.mnist import input_data
 import tensorflow as tf
 from mpl_toolkits.mplot3d import Axes3D
+import time
 
 layer1WeightAverage = 0;
 layer2WeightAverage = 0;
@@ -124,14 +125,6 @@ class neuralNetwork():
         print("DONE")
 
         #The idea is to average the nudges through all the training examples so that the network doesn't learn to recognize one specific example (Rather than applying many partially incorrect nudges, it applies some precise nudges)
-        layer1WeightAverage += layer1WeightNudges
-        layer2WeightAverage += layer2WeightNudges
-        layer3WeightAverage += layer3WeightNudges
-
-        layer1BiasAverage += layer1BiasNudge
-        layer2BiasAverage += layer2BiasNudge
-        layer3BiasAverage += layer3BiasNudge
-
         global layer1WeightAverage
         global layer2WeightAverage
         global layer3WeightAverage
@@ -183,12 +176,15 @@ class neuralNetwork():
         layer3BiasNudge = np.zeros((1, 10))
 
         costDer = 2 * (outputFromLayer3 - desiredOutput)
-        layer3BiasNudge, activation = np.dot(np.transpose(costDer), self.sigmoidPrime(outputFromLayer3))
+        layer3BiasNudge = self.sigmoidPrime(outputFromLayer3) * costDer
+        activation = np.transpose(layer3BiasNudge)
         layer3WeightNudges = np.dot(activation, outputFromLayer2)
-        layer2BiasNudge, activation = np.dot(self.layer3.synaptic_weights, activation)
-        layer2WeightNudges = np.dot(np.dot(activation, self.sigmoidPrime(outputFromLayer2)), outputFromLayer1)
-        layer1BiasNudge, activation = np.dot(self.layer2.synaptic_weights, activation)
-        layer1WeightNudges = np.dot(np.dot(activation, self.sigmoidPrime(outputFromLayer1)), trainingSetInputs)
+        activation = np.dot(self.layer3.synaptic_weights, activation)
+        layer2BiasNudge = np.transpose(activation)
+        layer2WeightNudges = np.dot(np.transpose(layer2BiasNudge * self.sigmoidPrime(outputFromLayer2)), outputFromLayer1)
+        activation = np.dot(self.layer2.synaptic_weights, activation)
+        layer1BiasNudge = activation
+        layer1WeightNudges = np.dot(np.transpose(layer1BiasNudge * self.sigmoidPrime(outputFromLayer1)), trainingSetInputs)
 
         return layer3WeightNudges, layer2WeightNudges, layer1WeightNudges, layer3BiasNudge, layer2BiasNudge, layer1BiasNudge
 
@@ -242,7 +238,7 @@ if __name__ == "__main__":
 
     neuralNet = neuralNetwork(layer1, layer2, layer3)
 
-    for i in range(60000):
+    for i in range(1):
 
         neuralNet.train(x_train[i], y_train[i], i)
         print("Done training with the ", i + 1, "th data. On to the ", i + 2,"th data")
