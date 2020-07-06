@@ -5,14 +5,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from mpl_toolkits.mplot3d import Axes3D
 import time
-
-layer1WeightAverage = 0;
-layer2WeightAverage = 0;
-layer3WeightAverage = 0;
-
-layer1BiasAverage = 0;
-layer2BiasAverage = 0;
-layer3BiasAverage = 0;
+from mpl_toolkits import mplot3d
 
 class neuronLayer():
 
@@ -20,7 +13,7 @@ class neuronLayer():
 
         #Each neuron layer is comprised of 2 matrices: one is the weights and the other is the biases
         #Initially, I just choose random numbers which will output random results
-        self.synaptic_weights = np.random.random((numOfInputsPerNeuron, numOfNeurons)) * 0.01
+        self.synaptic_weights = (np.random.random((numOfInputsPerNeuron, numOfNeurons)) * 16) - 8
         self.biases = np.zeros((1, numOfNeurons))
         #self.biases = np.random.random((1, numOfNeurons)) - 0.5
 
@@ -33,18 +26,24 @@ class neuralNetwork():
         self.layer2 = layer2
         self.layer3 = layer3
 
+        self.layer1WeightAverage = np.zeros((784, 16))
+        self.layer2WeightAverage = np.zeros((16, 16))
+        self.layer3WeightAverage = np.zeros((16, 10))
+
+        self.layer1BiasAverage = np.zeros((1, 16))
+        self.layer2BiasAverage = np.zeros((1, 16))
+        self.layer3BiasAverage = np.zeros((1, 10))
+
+        fig = plt.figure()
+        self.ax = plt.axes(projection = '3d')
+
     #input = np.linspace(-10, 10, 100)
 
     #I used the sigmoid function as my activation function
     #There are multiple sigmoids because some take in a matrix and return a sigmoided matrix and the other one just takes one value
     def sigmoid(self, x):
 
-        if len(x[0]) == 16: output = np.zeros((1, 16))
-        else: output = np.zeros((1, 10))
-
-        for i in range(x.size):
-
-            output[0][i] = 1/(1+np.exp(-(x[0][i])))
+        output = (1 / (1 + np.exp(-(x))))
 
         return output
 
@@ -62,25 +61,20 @@ class neuralNetwork():
 
         for i in range(len(x)):
 
-            x[i] = x[i] / 255
+            x[i] = x[i] / 25.5
 
         return x
 
     #Sigmoid derivative needed for backpropagation algorithm
     def sigmoidPrime(self, x):
 
-        output = (1/(1 + np.exp(x))) * ( 1 - (1/(1 + np.exp(-(x)))))
+        #output = (1/(1 + np.exp(x))) * ( 1 - (1/(1 + np.exp(-(x)))))
+        output = (np.exp(-(x))) * (1/((1 + np.exp(-(x))) ** 2))
 
         return output
 
     #This is the train method. I set a learning rate for both the bias and weights
     def train(self, input_pixels, desired_output, dataPoint):
-
-        print("WEIGHTS")
-        print(self.layer1.synaptic_weights)
-        print(self.layer2.synaptic_weights)
-        print(self.layer3.synaptic_weights)
-        print("DONE")
 
         learningRateWeight = 0.3
         learningRateBias = 0.3
@@ -91,7 +85,7 @@ class neuralNetwork():
 
             input = np.concatenate((input, input_pixels[i]))
 
-        input = self.scale(input)
+        input = self.sigmoid2(self.scale(input))
 
         #I break up the input to separate the input and output from the input line from the text file
         #An example input looks like this: 21 90 63-0 0 0 1 0 0
@@ -103,73 +97,58 @@ class neuralNetwork():
         trainingSetOutputs = [0] * 10
         trainingSetOutputs[desired_output] = 1
 
-        print("OUTPUTS:")
-        print(outputFromLayer1)
-        print(outputFromLayer2)
-        print(outputFromLayer3)
-        print("DONE")
-
         #After getting the outputs, we can backpropagate (math is commented at the method itself)
         layer3WeightNudges, layer2WeightNudges, layer1WeightNudges, layer3BiasNudge, layer2BiasNudge, layer1BiasNudge = self.backprop(outputFromLayer3, outputFromLayer2, outputFromLayer1, trainingSetOutputs, input)
 
-        print("WEIGHT NUDGES")
         print(layer3WeightNudges)
-        print(layer2WeightNudges)
-        print(layer1WeightNudges)
-        print("DONE")
+        print(desired_output)
 
-        print("BIAS NUDGES")
-        print(layer3BiasNudge)
-        print(layer2BiasNudge)
-        print(layer1BiasNudge)
-        print("DONE")
+        self.layer1.synaptic_weights -= (layer1WeightNudges * learningRateWeight)
+        self.layer2.synaptic_weights -= (layer2WeightNudges * learningRateWeight)
+        self.layer3.synaptic_weights -= (layer3WeightNudges * learningRateWeight)
 
-        #The idea is to average the nudges through all the training examples so that the network doesn't learn to recognize one specific example (Rather than applying many partially incorrect nudges, it applies some precise nudges)
-        global layer1WeightAverage
-        global layer2WeightAverage
-        global layer3WeightAverage
+        self.layer1.biases -= (layer1BiasNudge * learningRateBias)
+        self.layer2.biases -= (layer2BiasNudge * learningRateBias)
+        self.layer3.biases -= (layer3BiasNudge * learningRateBias)
 
-        global layer1BiasAverage
-        global layer2BiasAverage
-        global layer3BiasAverage
+        '''
+        self.layer1WeightAverage += (layer1WeightNudges)
+        self.layer2WeightAverage += (layer2WeightNudges)
+        self.layer3WeightAverage += (layer3WeightNudges)
 
-        layer1WeightAverage += (layer1WeightNudges)
-        layer2WeightAverage += (layer2WeightNudges)
-        layer3WeightAverage += (layer3WeightNudges)
+        self.layer1BiasAverage += (layer1BiasNudge)
+        self.layer2BiasAverage += (layer2BiasNudge)
+        self.layer3BiasAverage += (layer3BiasNudge)
 
-        layer1BiasAverage += (layer1BiasNudge)
-        layer2BiasAverage += (layer2BiasNudge)
-        layer3BiasAverage += (layer3BiasNudge)
+        if dataPoint % 10 == 0:
 
-        if dataPoint % 100 == 0:
+            self.layer1.synaptic_weights -= (((self.layer1WeightAverage * learningRateWeight) / 10))
+            self.layer2.synaptic_weights -= (((self.layer2WeightAverage * learningRateWeight) / 10))
+            self.layer3.synaptic_weights -= (((self.layer3WeightAverage * learningRateWeight) / 10))
 
-            self.layer1.synaptic_weights -= ((layer1WeightAverage / 100) * learningRateWeight)
-            self.layer2.synaptic_weights -= ((layer2WeightAverage / 100) * learningRateWeight)
-            self.layer3.synaptic_weights -= ((layer3WeightAverage / 100) * learningRateWeight)
+            self.layer1.biases -= ((self.layer1BiasAverage / 10) * learningRateBias)
+            self.layer2.biases -= ((self.layer2BiasAverage / 10) * learningRateBias)
+            self.layer3.biases -= ((self.layer3BiasAverage / 10) * learningRateBias)
 
-            self.layer1.biases -= ((layer1BiasAverage / 100) * learningRateBias)
-            self.layer2.biases -= ((layer2BiasAverage / 100) * learningRateBias)
-            self.layer3.biases -= ((layer3BiasAverage / 100) * learningRateBias)
+            self.layer1WeightAverage = np.zeros((784, 16));
+            self.layer2WeightAverage = np.zeros((16, 16));
+            self.layer3WeightAverage = np.zeros((16, 10));
 
-            layer1WeightAverage = 0
-            layer2WeightAverage = 0
-            layer3WeightAverage = 0
-
-            layer1BiasAverage = 0
-            layer2BiasAverage = 0
-            layer3BiasAverage = 0
+            self.layer1BiasAverage = np.zeros((1, 16));
+            self.layer2BiasAverage = np.zeros((1, 16));
+            self.layer3BiasAverage = np.zeros((1, 10));
+            '''
 
     #And now for the meat of the network
     def backprop(self, outputFromLayer3, outputFromLayer2, outputFromLayer1, desiredOutput, trainingSetInputs):
 
-        print("CHECK: ", len(trainingSetInputs))
         #I create empty 1 X 6 matrices to record the nudges after I compute them
         layer3WeightNudges = np.zeros((16, 10))
         layer2WeightNudges = np.zeros((16, 16))
         layer1WeightNudges = np.zeros((784, 16))
-        #layer2ActivationNudge = np.zeros((1, 16))
-        #layer1ActivationNudge = np.zeros((1, 16))
-        #layer0ActivationNudge = np.zeros((1, 784))
+        layer2ActivationNudge = np.zeros((1, 16))
+        layer1ActivationNudge = np.zeros((1, 16))
+        layer0ActivationNudge = np.zeros((1, 784))
 
         layer1BiasNudge = np.zeros((1, 16))
         layer2BiasNudge = np.zeros((1, 16))
@@ -177,30 +156,27 @@ class neuralNetwork():
 
         costDer = 2 * (outputFromLayer3 - desiredOutput)
         layer3BiasNudge = self.sigmoidPrime(outputFromLayer3) * costDer
-        activation = np.transpose(layer3BiasNudge)
-        layer3WeightNudges = np.dot(activation, outputFromLayer2)
-        activation = np.dot(self.layer3.synaptic_weights, activation)
-        layer2BiasNudge = np.transpose(activation)
-        layer2WeightNudges = np.dot(np.transpose(layer2BiasNudge * self.sigmoidPrime(outputFromLayer2)), outputFromLayer1)
-        activation = np.dot(self.layer2.synaptic_weights, activation)
-        layer1BiasNudge = activation
-        layer1WeightNudges = np.dot(np.transpose(layer1BiasNudge * self.sigmoidPrime(outputFromLayer1)), trainingSetInputs)
+        activation = layer3BiasNudge
+        layer3WeightNudges = np.dot(np.transpose(outputFromLayer2), activation)
+        activation = np.dot(self.layer3.synaptic_weights, np.transpose(activation))
+        layer2BiasNudge = np.transpose(activation) * self.sigmoidPrime(outputFromLayer2)
+        activation = layer2BiasNudge
+        layer2WeightNudges = np.dot(np.transpose(outputFromLayer1), activation)
+        activation = np.dot(self.layer2.synaptic_weights, np.transpose(activation))
+        layer1BiasNudge = np.transpose(activation) * self.sigmoidPrime(outputFromLayer1)
+        activation = layer1BiasNudge
+        layer1WeightNudges = np.dot(np.transpose(trainingSetInputs), activation)
 
         return layer3WeightNudges, layer2WeightNudges, layer1WeightNudges, layer3BiasNudge, layer2BiasNudge, layer1BiasNudge
 
     #This thinking part is just multiplying the matrices to get the output layer. I didn't find a matrix mutliplication method that suits my needs so I just wrote it but there may be one out there
     def think(self, inputs):
 
-        print("INPUTS")
-        print(inputs)
-        print("DONE")
+        outputFromLayer1 = self.sigmoid(np.dot(inputs, self.layer1.synaptic_weights) + self.layer1.biases)
+        outputFromLayer2 = self.sigmoid(np.dot(outputFromLayer1, self.layer2.synaptic_weights) + self.layer2.biases)
+        outputFromLayer3 = self.sigmoid(np.dot(outputFromLayer2, self.layer3.synaptic_weights) + self.layer3.biases)
 
-        outputFromLayer1 = self.sigmoid(np.dot(self.sigmoid2(inputs), self.layer1.synaptic_weights) - self.layer1.biases)
-        outputFromLayer2 = self.sigmoid(np.dot(outputFromLayer1, self.layer2.synaptic_weights) - self.layer2.biases)
-        outputFromLayer3 = self.sigmoid(np.dot(outputFromLayer2, self.layer3.synaptic_weights) - self.layer3.biases)
-
-        print(self.layer3.synaptic_weights.shape)
-        print(outputFromLayer2.shape)
+        print(outputFromLayer3)
 
         return outputFromLayer1, outputFromLayer2, outputFromLayer3
 
@@ -213,6 +189,8 @@ class neuralNetwork():
         for i in range(0, 28):
 
             input = np.concatenate((input, testData[i]))
+
+        input = self.sigmoid2(self.scale(input))
 
         #trainingSetInputs = self.sigmoid2(trainingSetInputs)
         outputsFromLayer1, outputsFromLayer2, outputsFromLayer3 = self.think(input)
@@ -240,8 +218,10 @@ if __name__ == "__main__":
 
     for i in range(1):
 
-        neuralNet.train(x_train[i], y_train[i], i)
-        print("Done training with the ", i + 1, "th data. On to the ", i + 2,"th data")
+        for t in range(1):
 
-    neuralNet.test(x_test[23])
-    print("The desired output of the test is: ", y_test[23])
+            neuralNet.train(x_train[t], y_train[t], t + 1)
+            print("Done training with the ", t + 1, "th data. On to the ", t + 2,"th data")
+
+    #neuralNet.test(x_test[23])
+    #print("The desired output of the test is: ", y_test[23])
