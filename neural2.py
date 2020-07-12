@@ -1,4 +1,4 @@
-256#import tensorflow_datasets as tf
+#import tensorflow_datasets as tf
 import numpy as np
 import matplotlib.pyplot as plt
 #from tensorflow.examples.tutorials.mnist import input_data
@@ -6,6 +6,10 @@ import tensorflow as tf
 from mpl_toolkits.mplot3d import Axes3D
 import time
 from mpl_toolkits import mplot3d
+import pandas as pd
+import sys
+
+np.set_printoptions(threshold=sys.maxsize)
 
 class neuronLayer():
 
@@ -101,9 +105,6 @@ class neuralNetwork():
         #After getting the outputs, we can backpropagate (math is commented at the method itself)
         layer3WeightNudges, layer2WeightNudges, layer1WeightNudges, layer3BiasNudge, layer2BiasNudge, layer1BiasNudge = self.backprop(outputFromLayer3, outputFromLayer2, outputFromLayer1, trainingSetOutputs, input)
 
-        print(layer2WeightNudges)
-        print(self.layer1.synaptic_weights)
-
         '''
         self.layer1.synaptic_weights -= (layer1WeightNudges * learningRateWeight)
         self.layer2.synaptic_weights -= (layer2WeightNudges * learningRateWeight)
@@ -197,11 +198,6 @@ class neuralNetwork():
         #trainingSetInputs = self.sigmoid2(trainingSetInputs)
         outputsFromLayer1, outputsFromLayer2, outputsFromLayer3 = self.think(input)
 
-        print(self.layer1.synaptic_weights)
-        print(self.layer2.synaptic_weights)
-        print(self.layer3.synaptic_weights)
-
-
         fileWeight = open("outputWeights.txt", "w")
         fileWeight.write("layer1: ")
         fileWeight.write(str(self.layer1.synaptic_weights))
@@ -244,5 +240,5 @@ if __name__ == "__main__":
             neuralNet.train(x_train[t], y_train[t], t + 1)
             print("Done training with the ", t + 1, "th data. On to the ", t + 2,"th data")
 
-    neuralNet.test(x_test[15])
-    print("The desired output of the test is: ", y_test[15])
+    neuralNet.test(x_test[12])
+    print("The desired output of the test is: ", y_test[12])
