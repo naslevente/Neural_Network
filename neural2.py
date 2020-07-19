@@ -241,4 +241,5 @@ if __name__ == "__main__":
             print("Done training with the ", t + 1, "th data. On to the ", t + 2,"th data")
 
     neuralNet.test(x_test[12])
+    print("Finished the training and testing of the neural network")
     print("The desired output of the test is: ", y_test[12])
