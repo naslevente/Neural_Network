@@ -187,7 +187,7 @@ class neuralNetwork():
     def WriteToCSV(self, fileName, outputMatrix, rows, cols):
 
         with open(fileName, mode = 'w') as output_file:
-            output_file = csv.writer(output_file, delimited = ',', quotechar = '"', quoting = csv.QUOTE_MINIMAL)
+            output_file = csv.writer(output_file, delimiter = ',', quotechar = '"', quoting = csv.QUOTE_MINIMAL)
 
             for i in range(rows):
 
