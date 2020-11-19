@@ -209,13 +209,13 @@ class neuralNetwork():
         #trainingSetInputs = self.sigmoid2(trainingSetInputs)
         outputsFromLayer1, outputsFromLayer2, outputsFromLayer3 = self.think(input)
 
-        WriteToCSV("layer1OutputWeights.csv", self.layer1.synaptic_weights, 784, 256)
-        WriteToCSV("layer2OutputWeights.csv", self.layer2.synaptic_weights, 256, 256)
-        WriteToCSV("layer3OutputWeights.csv", self.layer3.synaptic_weights, 256, 10)
+        self.WriteToCSV("layer1OutputWeights.csv", self.layer1.synaptic_weights, 784, 256)
+        self.WriteToCSV("layer2OutputWeights.csv", self.layer2.synaptic_weights, 256, 256)
+        self.WriteToCSV("layer3OutputWeights.csv", self.layer3.synaptic_weights, 256, 10)
 
-        WriteToCSV("layer1OutputBias.csv", self.layer1.biases, 1, 256)
-        WriteToCSV("layer1OutputBias.csv", self.layer1.biases, 1, 256)
-        WriteToCSV("layer1OutputBias.csv", self.layer1.biases, 1, 10)
+        self.WriteToCSV("layer1OutputBias.csv", self.layer1.biases, 1, 256)
+        self.WriteToCSV("layer1OutputBias.csv", self.layer2.biases, 1, 256)
+        self.WriteToCSV("layer1OutputBias.csv", self.layer3.biases, 1, 10)
 
         '''
         fileWeight = open("outputWeights.txt", "w")
