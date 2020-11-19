@@ -193,7 +193,7 @@ class neuralNetwork():
 
                 for k in range(cols):
 
-                    output_file.writerow([str(outputMatrix[i][k]]))
+                    output_file.writerow([str(outputMatrix[i][k])])
 
     #The test method is the same as the train method minus all the math. I just get the output
     def test(self, testData):
