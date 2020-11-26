@@ -214,8 +214,8 @@ class neuralNetwork():
         self.WriteToCSV("layer3OutputWeights.csv", self.layer3.synaptic_weights, 256, 10)
 
         self.WriteToCSV("layer1OutputBias.csv", self.layer1.biases, 1, 256)
-        self.WriteToCSV("layer1OutputBias.csv", self.layer2.biases, 1, 256)
-        self.WriteToCSV("layer1OutputBias.csv", self.layer3.biases, 1, 10)
+        self.WriteToCSV("layer2OutputBias.csv", self.layer2.biases, 1, 256)
+        self.WriteToCSV("layer3OutputBias.csv", self.layer3.biases, 1, 10)
 
         '''
         fileWeight = open("outputWeights.txt", "w")
